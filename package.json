@@ -18,11 +18,16 @@
     "@xstate/immer": "^0.3.3",
     "@xstate/react": "^3.2.2",
     "astro": "^3.2.0",
+    "class-variance-authority": "^0.7.0",
     "immer": "^10.0.2",
     "nanostores": "^0.9.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "tailwindcss": "^3.0.24",
     "xstate": "^4.38.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "daisyui": "^3.8.2"
   }
 }

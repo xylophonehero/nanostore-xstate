@@ -1,4 +1,4 @@
-import { createMachine, assign } from "xstate"
+import { createMachine, assign, raise } from "xstate"
 import { createActorStore } from "../utils/actorStores"
 import { $trafficLightActor, isTrafficLightGreen } from "./trafficLightActor"
 import { createUpdater } from '@xstate/immer'
@@ -30,7 +30,20 @@ const gameMachine = createMachine({
       }
     },
     playing: {
+      invoke: {
+        id: 'keydownListener',
+        src: () => (callback) => {
+          document.addEventListener('keydown', callback)
+          return () => {
+            document.removeEventListener('keydown', callback)
+          }
+        },
+      },
       on: {
+        keydown: {
+          cond: 'isSpacebar',
+          actions: raise({ type: 'GO' }),
+        },
         GO: [
           {
             cond: 'isGreen',
@@ -61,13 +74,17 @@ const gameMachine = createMachine({
       clicks: 0,
     }),
     startTrafficLight: () => {
-      $trafficLightActor.value?.send('TOGGLE')
+      $trafficLightActor.value?.send('START')
     },
     stopTrafficLight: () => {
-      $trafficLightActor.value?.send('TOGGLE')
+      $trafficLightActor.value?.send('STOP')
     },
   },
   guards: {
+    isSpacebar: (ctx, e) => {
+      console.log(e)
+      return e.code === 'Space'
+    },
     // FAILED: We want to make this guard pure
     // isGreen: () => isTrafficLightGreen.get(),
     isGreen: (context) => context.isTrafficLightGreen,

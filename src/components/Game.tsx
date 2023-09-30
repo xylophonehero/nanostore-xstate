@@ -9,33 +9,36 @@ export const Game = () => {
 
   if (gameState.matches('idle')) {
     return (
-      <div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => $gameMachineActor.value?.send({ type: 'START' })}>Start game</button>
-
-
+      <div className="prose text-center m-auto">
+        <h1>Welcome to the game</h1>
+        <p>Press space bar when the light is green</p>
+        <p>If you press when the light is not green, you will lose</p>
+        <div>
+          <button
+            className="btn btn-primary"
+            onClick={() => $gameMachineActor.value?.send({ type: 'START' })}>Start game</button>
+        </div>
       </div>
     )
   }
 
   if (gameState.matches('gameOver')) {
     return (
-      <div>
+      <div className="prose text-center m-auto">
+        <h1>Game over</h1>
+        <p>You got {clicks} points</p>
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="btn btn-primary"
           onClick={() => $gameMachineActor.value?.send({ type: 'START' })}>Start game</button>
-        <div>Game over</div>
-        <div>You got {clicks} points</div>
       </div>
     )
   }
 
   return (
-    <div>
-      <div>Points: {clicks}</div>
+    <div className="prose text-center m-auto">
+      <p>Points: {clicks}</p>
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="btn btn-primary"
         onClick={() => $gameMachineActor.value?.send({ type: 'GO' })}>Click</button>
     </div>
   )

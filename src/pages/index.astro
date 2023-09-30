@@ -13,10 +13,20 @@ import { Game } from '../components/Game'
 		<title>Astro</title>
 	</head>
 	<body>
+    <section>
     <TrafficLight client:load />
+    </section>
+    <section>
     <Game client:load />
+    </section>
 	</body>
 </html>
+
+<style>
+section {
+margin-top: 40px;
+}
+</style>
 
 <!---->
 <!-- <style is:global> -->

@@ -9,14 +9,14 @@ const trafficLightMachine = createMachine({
   states: {
     off: {
       on: {
-        TOGGLE: 'on',
+        START: 'on',
       },
     },
     on: {
       initial: 'red',
       on: {
         TIMER: 'on',
-        TOGGLE: 'off',
+        STOP: 'off',
       },
       states: {
         green: {
