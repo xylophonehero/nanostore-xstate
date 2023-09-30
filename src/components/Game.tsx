@@ -5,6 +5,8 @@ export const Game = () => {
   const gameState = useStore($gameMachineState)
   const clicks = gameState.context.clicks
 
+  console.log(gameState.context)
+
   if (gameState.matches('idle')) {
     return (
       <div>

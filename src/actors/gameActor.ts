@@ -1,17 +1,23 @@
 import { createMachine, assign } from "xstate"
 import { createActorStore } from "../utils/actorStores"
 import { $trafficLightActor, isTrafficLightGreen } from "./trafficLightActor"
+import { createUpdater } from '@xstate/immer'
+
+const isTrafficLightGreenUpdater = createUpdater('computed.isTrafficLightGreen', (ctx, { input }) => {
+  ctx.isTrafficLightGreen = input
+})
 
 const gameMachine = createMachine({
   on: {
-    'update.isTrafficLightGreen': {
-      actions: assign({
-        isTrafficLightGreen: (_, event) => event.value,
-      }),
-    },
+    // TODO: Spread this in to the root somehow (multiple updaters)
+    [isTrafficLightGreenUpdater.type]: {
+      actions: isTrafficLightGreenUpdater.action,
+    }
   },
   context: {
     clicks: 0,
+    // TODO: calculate this instead from the event that is intially sent to it
+    isTrafficLightGreen: false,
   },
   initial: 'idle',
   states: {
@@ -73,6 +79,10 @@ export const {
   $actor: $gameMachineActor,
 } = createActorStore(gameMachine)
 
+
+// TODO: Make this part of the computed atom
 isTrafficLightGreen.subscribe((value) => {
-  $gameMachineActor.value?.send({ type: 'update.isTrafficLightGreen', value })
+  // TODO: The actor is null. Need to pass in some initial state here
+  console.log('isTrafficLightGreen subscribe', value, $gameMachineActor.value)
+  $gameMachineActor.value?.send(isTrafficLightGreenUpdater.update(value))
 })
