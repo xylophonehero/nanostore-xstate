@@ -1,4 +1,6 @@
 ---
+import { TrafficLight } from '../components/TrafficLight'
+import { Game } from '../components/Game'
 
 ---
 
@@ -11,6 +13,8 @@
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+    <TrafficLight client:load />
+    <Game client:load />
 	</body>
 </html>
+
