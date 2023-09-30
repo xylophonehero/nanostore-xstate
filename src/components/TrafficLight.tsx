@@ -24,9 +24,18 @@ export const TrafficLight = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col bg-base-300 p-2 space-y-2 rounded-lg">
-        <div className={light({ type: "red", isOn: state.matches('on.red') })} />
-        <div className={light({ type: "yellow", isOn: state.matches('on.yellow') })} />
-        <div className={light({ type: "green", isOn: state.matches('on.green') })} />
+        <div className={light({
+          type: "red",
+          isOn: state.matches('on.red'),
+        })} />
+        <div className={light({
+          type: "yellow",
+          isOn: state.matches('on.yellow')
+        })} />
+        <div className={light({
+          type: "green",
+          isOn: state.matches('on.green')
+        })} />
       </div>
     </div>
   )

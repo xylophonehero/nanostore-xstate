@@ -1,11 +1,28 @@
 import { useStore } from '@nanostores/react'
 import { $gameMachineActor, $gameMachineState } from '../actors/gameActor'
+import { useEffect, useRef } from 'react'
 
 export const Game = () => {
   const gameState = useStore($gameMachineState)
-  const clicks = gameState.context.clicks
+  const { clicks } = gameState.context
 
-  console.log(gameState.context)
+  const clickButtonRef = useRef<HTMLButtonElement>(null)
+
+  // TODO: Make into a custom hook which auto subscribes and unsubscribes
+  // NOTE: Subscribe to events happing in the machine
+  useEffect(() => {
+    const unsub = $gameMachineState.subscribe((state) => {
+      if (state.event.type === 'START') {
+        setTimeout(() => {
+          clickButtonRef.current?.focus()
+        })
+      }
+    })
+
+    return () => {
+      unsub()
+    }
+  }, [])
 
   if (gameState.matches('idle')) {
     return (
@@ -38,6 +55,7 @@ export const Game = () => {
     <div className="prose text-center m-auto">
       <p>Points: {clicks}</p>
       <button
+        ref={clickButtonRef}
         className="btn btn-primary"
         onClick={() => $gameMachineActor.value?.send({ type: 'GO' })}>Click</button>
     </div>

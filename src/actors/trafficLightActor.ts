@@ -3,7 +3,13 @@ import { createActorStore } from "../utils/actorStores"
 import { computed } from "nanostores"
 
 const trafficLightMachine = createMachine({
-  context: {} as object,
+  tsTypes: {} as import("./trafficLightActor.typegen").Typegen0,
+  schema: {
+    events: {} as
+      | { type: "START" }
+      | { type: "TIMER" }
+      | { type: "STOP" }
+  },
   id: 'trafficLight',
   initial: 'off',
   states: {
@@ -42,6 +48,6 @@ const trafficLightMachine = createMachine({
 export const {
   $state: $trafficLightState,
   $actor: $trafficLightActor,
-} = createActorStore(trafficLightMachine)
+} = createActorStore<typeof trafficLightMachine>(trafficLightMachine)
 
 export const isTrafficLightGreen = computed($trafficLightState, (state) => state.matches('on.green'))

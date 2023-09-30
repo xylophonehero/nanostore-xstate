@@ -3,21 +3,18 @@ import {
   atom, map, action, onMount,
 } from 'nanostores'
 import {
-  type ActorRefFrom, type Subscription, interpret,
+  type Subscription, interpret, type InterpreterFrom, type AnyStateMachine, type StateFrom,
 } from 'xstate'
 
 const defaultSiteContext = {}
 
-export const createActorStore = (actorLogic) => {
-  // TODO: Figue out types
-  const $actor = atom<ActorRefFrom<typeof actorLogic> | null>(null)
-  const $state = map<any>()
-  const $context = map<object>(defaultSiteContext)
-
-  const createSiteActor = () => interpret(actorLogic)
+export const createActorStore = <TMachine extends AnyStateMachine>(actorLogic: TMachine) => {
+  const $actor = atom<InterpreterFrom<TMachine> | null>(null)
+  const $state = map<StateFrom<TMachine>>()
+  const $context = map<TMachine['context']>(defaultSiteContext)
 
   onMount($actor, () => {
-    const actor = createSiteActor()
+    const actor = interpret(actorLogic) as InterpreterFrom<TMachine>
     $actor.set(actor)
     actor.start()
     return () => {
@@ -30,10 +27,9 @@ export const createActorStore = (actorLogic) => {
     let sub: Subscription | null = null
     const actorSub = $actor.subscribe((actor) => {
       if (actor) {
-        // TODO: figure out undefined
-        $state.set(actor.getSnapshot())
+        $state.set(actor.getSnapshot() as StateFrom<TMachine>)
         sub = actor.subscribe((snapshot) => {
-          $state.set(snapshot)
+          $state.set(snapshot as StateFrom<TMachine>)
         })
       } else {
         console.warn('🔥 ~ file: site.store.ts:43 ~ actor not active')
@@ -71,23 +67,3 @@ export const createActorStore = (actorLogic) => {
     $context,
   }
 }
-
-
-
-
-// $trafficLightState.subscribe((state) => {
-//   console.log('machine subscribe is on', state.matches('on'))
-// })
-//
-// export const isOnStore = computed($trafficLightState, (state) => state.matches('on'))
-//
-// isOnStore.subscribe((value) => {
-//   console.log('computed machine subscribe', value)
-// })
-
-// $siteState.listen((state, changed) => {
-//   console.log('machine listen is on', changed, state.matches('on'))
-// })
-//
-// listenKeys($siteContext, [''])
-

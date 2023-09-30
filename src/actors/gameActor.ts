@@ -1,15 +1,26 @@
-import { createMachine, assign, raise } from "xstate"
+import { createMachine, assign } from "xstate"
 import { createActorStore } from "../utils/actorStores"
 import { $trafficLightActor, isTrafficLightGreen } from "./trafficLightActor"
-import { createUpdater } from '@xstate/immer'
+import { createUpdater, type ImmerUpdateEvent } from '@xstate/immer'
 
-const isTrafficLightGreenUpdater = createUpdater('computed.isTrafficLightGreen', (ctx, { input }) => {
+type IsTrafficLightGreenUpdateContext = { isTrafficLightGreen: boolean }
+type IsTrafficLightGreenUpdateEvent = ImmerUpdateEvent<'computed.isTrafficLightGreen', boolean>
+const isTrafficLightGreenUpdater = createUpdater<IsTrafficLightGreenUpdateContext, IsTrafficLightGreenUpdateEvent>('computed.isTrafficLightGreen', (ctx, { input }) => {
   ctx.isTrafficLightGreen = input
 })
 
 const gameMachine = createMachine({
+  tsTypes: {} as import("./gameActor.typegen").Typegen0,
+  schema: {
+    context: {} as {
+      clicks: number
+    } & IsTrafficLightGreenUpdateContext,
+    events: {} as
+      | { type: "START" }
+      | { type: "GO" }
+      | IsTrafficLightGreenUpdateEvent
+  },
   on: {
-    // TODO: Spread this in to the root somehow (multiple updaters)
     [isTrafficLightGreenUpdater.type]: {
       actions: isTrafficLightGreenUpdater.action,
     }
@@ -30,20 +41,7 @@ const gameMachine = createMachine({
       }
     },
     playing: {
-      invoke: {
-        id: 'keydownListener',
-        src: () => (callback) => {
-          document.addEventListener('keydown', callback)
-          return () => {
-            document.removeEventListener('keydown', callback)
-          }
-        },
-      },
       on: {
-        keydown: {
-          cond: 'isSpacebar',
-          actions: raise({ type: 'GO' }),
-        },
         GO: [
           {
             cond: 'isGreen',
@@ -74,17 +72,13 @@ const gameMachine = createMachine({
       clicks: 0,
     }),
     startTrafficLight: () => {
-      $trafficLightActor.value?.send('START')
+      $trafficLightActor.value?.send({ type: 'START' })
     },
     stopTrafficLight: () => {
-      $trafficLightActor.value?.send('STOP')
+      $trafficLightActor.value?.send({ type: 'STOP' })
     },
   },
   guards: {
-    isSpacebar: (ctx, e) => {
-      console.log(e)
-      return e.code === 'Space'
-    },
     // FAILED: We want to make this guard pure
     // isGreen: () => isTrafficLightGreen.get(),
     isGreen: (context) => context.isTrafficLightGreen,
@@ -96,10 +90,8 @@ export const {
   $actor: $gameMachineActor,
 } = createActorStore(gameMachine)
 
-
 // TODO: Make this part of the computed atom
 isTrafficLightGreen.subscribe((value) => {
   // TODO: The actor is null. Need to pass in some initial state here
-  console.log('isTrafficLightGreen subscribe', value, $gameMachineActor.value)
   $gameMachineActor.value?.send(isTrafficLightGreenUpdater.update(value))
 })
