@@ -21,17 +21,17 @@ const trafficLightMachine = createMachine({
       states: {
         green: {
           after: {
-            3000: 'red',
+            2000: 'red',
           },
         },
         red: {
           after: {
-            3000: 'yellow',
+            2000: 'yellow',
           },
         },
         yellow: {
           after: {
-            3000: 'green',
+            2000: 'green',
           },
         },
       },

@@ -6,13 +6,13 @@ export const TrafficLight = () => {
 
   return (
     <div className="flex flex-col items-center mt-8">
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => $trafficLightActor.value.send('TOGGLE')}
-      >
-        Start game
-      </button>
-      <div className="flex mt-4">
+      {/* <button */}
+      {/*   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" */}
+      {/*   onClick={() => $trafficLightActor.value.send('TOGGLE')} */}
+      {/* > */}
+      {/*   Start game */}
+      {/* </button> */}
+      <div className="flex flex-col mt-4 bg-gray-800 p-2 space-y-2 rounded-lg">
         <div
           style={{
             backgroundColor: state.matches('on.red')
@@ -33,7 +33,6 @@ export const TrafficLight = () => {
               : '#bdc3c7',
             borderRadius: '50%',
             height: '48px',
-            marginLeft: '8px',
             width: '48px',
           }}
           data-state={state.matches('on.yellow')
@@ -47,7 +46,6 @@ export const TrafficLight = () => {
               : '#bdc3c7',
             borderRadius: '50%',
             height: '48px',
-            marginLeft: '8px',
             width: '48px',
           }}
           data-state={state.matches('on.green')

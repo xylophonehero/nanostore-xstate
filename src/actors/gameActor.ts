@@ -1,13 +1,28 @@
 import { createMachine, assign } from "xstate"
 import { createActorStore } from "../utils/actorStores"
-import { isTrafficLightGreen } from "./trafficLightActor"
+import { $trafficLightActor, isTrafficLightGreen } from "./trafficLightActor"
 
 const gameMachine = createMachine({
+  on: {
+    'update.isTrafficLightGreen': {
+      actions: assign({
+        isTrafficLightGreen: (_, event) => event.value,
+      }),
+    },
+  },
   context: {
     clicks: 0,
   },
-  initial: 'playing',
+  initial: 'idle',
   states: {
+    idle: {
+      on: {
+        START: {
+          actions: ['resetClicks', 'startTrafficLight'],
+          target: 'playing'
+        }
+      }
+    },
     playing: {
       on: {
         GO: [
@@ -16,6 +31,7 @@ const gameMachine = createMachine({
             actions: ['incrementClicks'],
           },
           {
+            actions: 'stopTrafficLight',
             target: 'gameOver',
           },
         ],
@@ -24,7 +40,7 @@ const gameMachine = createMachine({
     gameOver: {
       on: {
         START: {
-          actions: 'resetClicks',
+          actions: ['resetClicks', 'startTrafficLight'],
           target: 'playing'
         }
       }
@@ -38,10 +54,17 @@ const gameMachine = createMachine({
     resetClicks: assign({
       clicks: 0,
     }),
+    startTrafficLight: () => {
+      $trafficLightActor.value?.send('TOGGLE')
+    },
+    stopTrafficLight: () => {
+      $trafficLightActor.value?.send('TOGGLE')
+    },
   },
   guards: {
     // FAILED: We want to make this guard pure
-    isGreen: () => isTrafficLightGreen.get(),
+    // isGreen: () => isTrafficLightGreen.get(),
+    isGreen: (context) => context.isTrafficLightGreen,
   },
 })
 
@@ -49,3 +72,7 @@ export const {
   $state: $gameMachineState,
   $actor: $gameMachineActor,
 } = createActorStore(gameMachine)
+
+isTrafficLightGreen.subscribe((value) => {
+  $gameMachineActor.value?.send({ type: 'update.isTrafficLightGreen', value })
+})

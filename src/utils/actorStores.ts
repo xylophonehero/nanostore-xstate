@@ -1,9 +1,9 @@
 /* eslint-disable sort-keys/sort-keys-fix */
 import {
-  atom, map, action, onMount, listenKeys, computed,
+  atom, map, action, onMount,
 } from 'nanostores'
 import {
-  type ActorRefFrom, type Subscription, assign, createMachine, interpret,
+  type ActorRefFrom, type Subscription, interpret,
 } from 'xstate'
 
 const defaultSiteContext = {}
