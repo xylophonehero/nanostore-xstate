@@ -28,7 +28,7 @@ export const Game = () => {
     return (
       <div className="prose text-center m-auto">
         <h1>Welcome to the game</h1>
-        <p>Press space bar when the light is green</p>
+        <p>Press space bar or click the button when the light is green</p>
         <p>If you press when the light is not green, you will lose</p>
         <div>
           <button
